@@ -1,0 +1,5 @@
+Uma imobiliária possui apartamentos de dois e de três quartos para alugar, com uma ou duas suítes, respectivamente. Se houver mais de uma pessoa interessada em alugar um apartamento, a empresa prefere alugar a pessoas de idade igual ou superior a 50 anos. Portanto, estes são considerados clientes preferenciais e eles têm prioridade nos aluguéis. Dessa forma, um cliente deve possuir um nome, pelo menos. Para que um aluguel seja efetivado, não é necessário que a quantidade de pessoas interessadas seja igual a capacidade máxima do apartamento, mas observe que não é possível ter mais moradores em um apartamento do que sua quantidade de quartos. Considere que cada pessoa no apartamento fica associada a um quarto. A imobiliária dispõe de 3 apartamentos de dois quartos e 2 apartamentos de três quartos. Caso todos os apartamentos estejam alugados, os clientes têm a possibilidade de participar de uma lista de espera. A imobiliária também dispõe de uma cobertura, mas esta só pode ser alugada se todos os moradores interessados forem clientes preferenciais.
+
+Cliente: Aline
+
+ 
