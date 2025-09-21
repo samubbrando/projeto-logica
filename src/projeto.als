@@ -17,8 +17,8 @@ abstract sig Cliente {
     	nome: one Nome
 }
 
-sig ClienteRegular extends Cliente {}
-sig ClientePreferencial extends Cliente {}
+sig ClienteRegular extends Cliente {} // < 50 anos
+sig ClientePreferencial extends Cliente {} // >= 50 anos 
 
 fact nomesUnicos {
     all n: Nome | one c: Cliente | c.nome = n
@@ -31,6 +31,7 @@ sig Quarto {
 }
 sig Suite extends Quarto {}
 
+//Um cliente não pode morar em mais de um apartamento
 fact restricaoDeAluguel {
 	all c: Cliente | lone q: Quarto | q.morador = c
 }
@@ -47,6 +48,7 @@ fact numeroDeImoveis {
 	(#Apt2Quartos = 3) and (#Apt3Quartos = 2)
 }
 
+// Os quartos devem ser ligados a um apartamento
 fact quartosPorApt {
 	all q: Quarto | one a: Apartamento | q in a.quartos
 }
@@ -73,35 +75,74 @@ fact prioridadeAluguel {
     )
 }
 
+// Apartamentos não alugados (ninguém está morando nele)
 fact definirApartamentosLivres {
     Imobiliaria.apartamentosLivres = { a: Apartamento |
         all q: a.quartos | no q.morador
     }
 }
 
+// Lista de espera é formada por todo cliente que não está morando em um apartamento
 fact definirListaDeEspera {
     Imobiliaria.listaDeEspera = { c: Cliente |
         no q: Quarto | q.morador = c
     }
 }
 
+// Só deve ter cliente na lista de espera quando todos os apartamentos estão alugados
 fact semEsperaComApartamentoLivre {
     no Imobiliaria.apartamentosLivres or no Imobiliaria.listaDeEspera
 }
 
+// A corbetura só pode ter clientes preferenciais
 fact restricaoCobertura {
     all q: Cobertura.quartos | 
         some q.morador implies q.morador in ClientePreferencial
 }
 
+// Os clientes e apartamento estão na imobiliária
 fact contidosNaImobiliaria {
     Cliente in Imobiliaria.clientes
     Apartamento in Imobiliaria.apartamentos
 }
 
-fact aa {
-	all q: Cobertura.quartos | 
-        some q.morador
-}	
+//  Asserts
 
-run {} for 24
+// O apartamento não pode ter mais moradores do que quartos
+assert capacidadeRespeitada {
+    all a: Apartamento |
+        #a.quartos >= #(a.quartos.morador)
+}
+
+// Prioridade para o cliente preferencial (mais de 50 anos)
+assert prioridadeRespeitada {
+    (some cp: ClientePreferencial | no cp.~morador)
+    implies (no cr: ClienteRegular | some cr.~morador)
+}
+
+// Clientes sem apartamento devem ficar na lista de espera
+assert clientesNaListaDeEspera {
+    all c: Cliente |
+        (no q: Quarto | q.morador = c) implies c in Imobiliaria.listaDeEspera
+}
+
+check clientesNaListaDeEspera for 24
+check capacidadeRespeitada for 24
+check prioridadeRespeitada for 24
+
+// Cenário exemplo
+
+pred exemplo {
+    some ClienteRegular
+    and some ClientePreferencial
+
+    and some a: Apt2Quartos |
+        one q: a.quartos | q.morador in ClienteRegular
+
+    and some b: Apt3Quartos |
+        one s: b.quartos & Suite | s.morador in ClientePreferencial
+
+    and some c: Cliente | no q: Quarto | q.morador = c
+}
+
+run exemplo for 24
